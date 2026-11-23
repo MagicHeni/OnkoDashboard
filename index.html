@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Onko-Board">
+<meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161616" media="(prefers-color-scheme: dark)">
+<title>Onko-Board · Prototyp</title>
+<style>
+:root{
+  --bg:#f6f5f2; --card:#ffffff; --tile:#efede8; --text:#1d1d1b; --muted:#6b6a66; --line:#e3e1db;
+  --red:#b42318; --red-bg:#fdecea; --amber:#9a5b00; --amber-bg:#fdf3e1; --green:#2f6b1f; --green-bg:#eaf3de;
+  --blue:#1d5fa5; --blue-bg:#e6f1fb; --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#161616; --card:#212121; --tile:#2a2a2a; --text:#eeeeec; --muted:#a3a29d; --line:#353533;
+    --red:#ff8a80; --red-bg:#3a1f1d; --amber:#f2c063; --amber-bg:#3a2e17; --green:#9fd07a; --green-bg:#22301a;
+    --blue:#8ec1f5; --blue-bg:#18293b;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.wrap{max-width:1280px;margin:0 auto;padding:14px 14px 40px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+h1{font-size:20px;font-weight:600;margin:0}
+h2{font-size:14px;font-weight:600;margin:0 0 8px;color:var(--muted);text-transform:none;letter-spacing:.2px}
+.sub{font-size:13px;color:var(--muted);margin:2px 0 0}
+.banner{background:var(--blue-bg);color:var(--blue);font-size:13px;border-radius:10px;padding:8px 12px;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.kpi{background:var(--tile);border-radius:12px;padding:12px 14px;border:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:26px;font-weight:600;line-height:1.2}
+.kpi.red{background:var(--red-bg)} .kpi.red .l,.kpi.red .v{color:var(--red)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+section{min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.row{display:flex;gap:10px;align-items:center;padding:11px 14px;border-top:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-bottom:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.row:first-child{border-top:0}
+.row:active{background:var(--tile)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.red{background:var(--red)} .dot.amber{background:var(--amber)} .dot.green{background:var(--green)}
+.grow{flex:1;min-width:0}
+.t{font-size:15px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s{font-size:12.5px;color:var(--muted);margin:0}
+.done .t{text-decoration:line-through;color:var(--muted)}
+.chev{color:var(--muted);font-size:18px;flex:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:6px;margin-left:4px;vertical-align:1px}
+.tag.red{background:var(--red-bg);color:var(--red)} .tag.amber{background:var(--amber-bg);color:var(--amber)} .tag.blue{background:var(--blue-bg);color:var(--blue)}
+.bar{height:5px;background:var(--tile);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--blue);border-radius:3px}
+.time{width:48px;color:var(--muted);font-size:14px;flex:none;font-variant-numeric:tabular-nums}
+.mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mini .card{padding:12px 14px}
+.big{font-size:22px;font-weight:600}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.week div{text-align:center;font-size:11.5px;border-radius:6px;padding:5px 0;background:var(--green-bg);color:var(--green)}
+.week div.gap{background:var(--red-bg);color:var(--red);font-weight:600}
+svg{display:block}
+.chartbox{padding:12px 14px}
+.legend{font-size:12px;color:var(--muted);margin-top:4px}
+dialog{border:0;border-radius:18px;padding:0;width:min(560px,94vw);max-height:88vh;background:var(--card);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg-h{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 16px 8px}
+.dlg-b{padding:0 16px 16px;overflow:auto}
+.x{border:0;background:var(--tile);color:var(--text);width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer}
+.trend{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px}
+.trend .h{display:flex;justify-content:space-between;font-size:13px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:10px 14px;font:inherit;font-size:14px;cursor:pointer;margin-top:14px;width:100%}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+footer{font-size:12px;color:var(--muted);margin-top:24px;text-align:center}
+@media (min-width:760px){
+  .kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (min-width:1100px){
+  .wrap{padding:24px 28px 48px}
+  .kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .grid{grid-template-columns:1.15fr 1fr 1fr;grid-template-rows:auto 1fr;align-items:start}
+  .span2{grid-row:span 2}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Station Kinderonkologie</h1>
+      <p class="sub" id="stand"></p>
+    </div>
+  </header>
+  <div class="banner">Prototyp mit erfundenen Daten. Kein Bezug zu realen Patientinnen und Patienten.</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <section class="span2">
+      <h2>Braucht Aufmerksamkeit</h2>
+      <div class="card" id="alerts"></div>
+      <h2 style="margin-top:18px">Patientinnen und Patienten</h2>
+      <div class="chips" id="filters"></div>
+      <div class="card" id="patients"></div>
+    </section>
+
+    <section>
+      <h2>Heute</h2>
+      <div class="card" id="today"></div>
+    </section>
+
+    <section>
+      <h2>Studien und Fristen</h2>
+      <div class="card" id="studies"></div>
+    </section>
+
+    <section>
+      <h2>Leitung</h2>
+      <div class="mini" id="lead"></div>
+    </section>
+
+    <section>
+      <h2>Qualität · Fieber in Neutropenie je Monat</h2>
+      <div class="card chartbox" id="quality"></div>
+    </section>
+  </div>
+  <footer>Onko-Board · Prototyp · Stand der Beispieldaten fest hinterlegt</footer>
+</div>
+
+<dialog id="dlg">
+  <div class="dlg-h">
+    <div><p class="t" id="dlg-title" style="font-weight:600;font-size:17px;white-space:normal"></p><p class="s" id="dlg-sub"></p></div>
+    <button class="x" aria-label="Schließen" onclick="document.getElementById('dlg').close()">×</button>
+  </div>
+  <div class="dlg-b" id="dlg-body"></div>
+</dialog>
+
+<script>
+const PATIENTS = [
+  {id:"P-01",alter:"6 J",dx:"ALL",phase:"Reinduktion",w:[34,104],anc:[1.8,1.5,1.1,0.9,0.7,0.6,0.5],plt:[140,120,110,95,90,82,78],temp:[36.8,37.0,36.9,37.1,36.8,37.0,36.9],chemo:true,studie:true},
+  {id:"P-02",alter:"14 J",dx:"Osteosarkom",phase:"MAP Zyklus 3",w:[11,29],anc:[2.4,2.1,1.9,1.6,1.4,1.3,1.2],plt:[210,190,170,160,150,145,140],temp:[36.7,36.9,36.8,37.0,36.8,36.9,36.7],chemo:true,studie:false},
+  {id:"P-03",alter:"4 J",dx:"AML",phase:"Block 2",w:[9,24],anc:[0.3,0.2,0.1,0.1,0.0,0.1,0.1],plt:[42,30,22,16,12,10,9],temp:[37.1,37.4,37.2,37.6,37.3,37.5,37.4],chemo:false,studie:true},
+  {id:"P-04",alter:"9 J",dx:"Medulloblastom",phase:"Erhaltung",w:[30,52],anc:[2.0,2.2,2.1,2.3,2.2,2.4,2.3],plt:[180,185,190,188,192,195,198],temp:[36.6,36.7,36.6,36.8,36.7,36.6,36.7],chemo:true,studie:true},
+  {id:"P-05",alter:"2 J",dx:"Neuroblastom",phase:"Induktion",w:[6,20],anc:[0.9,0.7,0.5,0.4,0.3,0.3,0.4],plt:[95,80,70,60,55,52,50],temp:[37.0,37.2,37.1,37.3,37.2,37.1,37.2],chemo:false,studie:true},
+  {id:"P-06",alter:"16 J",dx:"Hodgkin-Lymphom",phase:"OEPA Zyklus 2",w:[5,12],anc:[3.1,2.8,2.5,2.2,2.0,1.9,1.8],plt:[220,210,200,190,185,180,178],temp:[36.8,36.7,36.9,36.8,36.7,36.8,36.8],chemo:true,studie:true},
+  {id:"P-07",alter:"7 J",dx:"ALL",phase:"Konsolidierung",w:[14,104],anc:[0.6,0.4,0.3,0.2,0.1,0.1,0.1],plt:[60,50,44,38,33,30,28],temp:[37.0,37.2,37.4,37.8,38.2,38.6,38.9],chemo:false,studie:true},
+  {id:"P-08",alter:"11 J",dx:"Ewing-Sarkom",phase:"VIDE Zyklus 4",w:[12,40],anc:[1.2,0.9,0.7,0.5,0.4,0.3,0.3],plt:[90,80,70,62,55,50,47],temp:[36.9,37.0,37.1,37.0,37.2,37.1,37.0],chemo:false,studie:false},
+  {id:"P-09",alter:"3 J",dx:"Wilms-Tumor",phase:"Postoperativ",w:[10,27],anc:[2.6,2.7,2.5,2.8,2.6,2.7,2.9],plt:[240,250,245,255,260,258,262],temp:[36.7,36.8,36.7,36.6,36.8,36.7,36.6],chemo:true,studie:true},
+  {id:"P-10",alter:"13 J",dx:"ALL",phase:"Induktion IA",w:[3,104],anc:[0.4,0.3,0.3,0.2,0.2,0.3,0.4],plt:[38,35,30,28,32,36,40],temp:[37.3,37.6,37.9,38.4,38.1,37.8,38.3],chemo:true,studie:true},
+  {id:"P-11",alter:"8 J",dx:"Rhabdomyosarkom",phase:"Zyklus 5",w:[16,27],anc:[1.6,1.4,1.3,1.1,1.0,0.9,0.9],plt:[150,140,130,125,118,110,105],temp:[36.8,36.9,36.8,37.0,36.9,36.8,36.9],chemo:false,studie:true},
+  {id:"P-12",alter:"5 J",dx:"ALL",phase:"Erhaltung",w:[70,104],anc:[1.4,1.5,1.3,1.6,1.5,1.4,1.5],plt:[210,205,215,220,212,218,222],temp:[36.6,36.7,36.6,36.7,36.6,36.8,36.7],chemo:true,studie:true},
+  {id:"P-13",alter:"15 J",dx:"AML",phase:"Block 1",w:[2,24],anc:[0.8,0.6,0.4,0.3,0.2,0.2,0.1],plt:[70,58,46,38,30,26,22],temp:[37.0,37.1,37.0,37.2,37.1,37.3,37.2],chemo:false,studie:false},
+  {id:"P-14",alter:"10 J",dx:"Hirnstammgliom",phase:"Bestrahlung",w:[4,6],anc:[2.9,2.8,2.8,2.7,2.9,2.8,2.7],plt:[230,228,226,230,225,224,226],temp:[36.7,36.6,36.8,36.7,36.6,36.7,36.6],chemo:true,studie:false}
+];
+const BETTEN = 16;
+const TODAY = [
+  ["08:15","Visite Station","Mit Pflege und Assistenzärzten"],
+  ["11:00","Knochenmarkpunktion P-10","Tag 15 Induktion"],
+  ["14:00","Tumorboard","4 Fälle: P-05, P-08, P-11, P-13"],
+  ["15:30","Elterngespräch P-14","Befundbesprechung MRT"],
+  ["16:00","Oberarzt-Übergabe","Dienstarzt: Dr. B."]
+];
+const STUDIES = [
+  {t:"SAE-Meldung P-11",s:"Frist morgen 12:00",sev:"amber"},
+  {t:"Offene Queries",s:"7 offen, 2 älter als 14 Tage",sev:"amber"},
+  {t:"CRF Woche 33 · P-01",s:"Fällig Freitag",sev:"green"},
+  {t:"Monitorbesuch",s:"Do 26.11., 09:00",sev:"green"}
+];
+const QUALITY = {labels:["Jun","Jul","Aug","Sep","Okt","Nov"],values:[6,4,7,5,3,4]};
+const LEAD = {briefe:6,briefeAlt:2,week:["Mo","Di","Mi","Do","Fr","Sa","So"],gaps:[5]};
+
+const last = a => a[a.length-1];
+const fmt = n => n.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1});
+const isAplasie = p => last(p.anc) < 0.5;
+const isFieber = p => last(p.temp) >= 38.0;
+
+let done = new Set();
+try { done = new Set(JSON.parse(localStorage.getItem("onko-done")||"[]")); } catch(e) {}
+function saveDone(){ try { localStorage.setItem("onko-done", JSON.stringify([...done])); } catch(e) {} }
+
+function buildAlerts(){
+  const a = [];
+  PATIENTS.forEach(p=>{
+    if (isFieber(p) && isAplasie(p)) a.push({id:"fn-"+p.id,sev:"red",t:`${p.id} · ${fmt(last(p.temp))} °C, ANC ${fmt(last(p.anc))}`,s:"Fieber in Neutropenie, Antibiose prüfen",pid:p.id});
+    else if (isFieber(p)) a.push({id:"f-"+p.id,sev:"amber",t:`${p.id} · ${fmt(last(p.temp))} °C`,s:"Fieber, Neutrophile noch über 0,5",pid:p.id});
+    if (last(p.plt) < 10) a.push({id:"plt-"+p.id,sev:"amber",t:`${p.id} · Thrombozyten ${last(p.plt)}/nl`,s:"Transfusion noch nicht angeordnet",pid:p.id});
+  });
+  a.push({id:"sae-P-11",sev:"amber",t:"SAE-Meldung P-11",s:"Frist morgen 12:00"});
+  const rank = {red:0,amber:1,green:2};
+  return a.sort((x,y)=> (done.has(x.id)-done.has(y.id)) || rank[x.sev]-rank[y.sev]);
+}
+
+function renderKPIs(){
+  const k = [
+    {l:"Belegung",v:`${PATIENTS.length}/${BETTEN}`},
+    {l:"In Aplasie",v:PATIENTS.filter(isAplasie).length,f:"aplasie"},
+    {l:"Fieber + Neutropenie",v:PATIENTS.filter(p=>isFieber(p)&&isAplasie(p)).length,red:true,f:"fieber"},
+    {l:"Chemo-Gaben heute",v:PATIENTS.filter(p=>p.chemo).length,f:"chemo"},
+    {l:"Studienpatienten",v:PATIENTS.filter(p=>p.studie).length,f:"studie"},
+    {l:"Aufnahmen / Entlass.",v:"2 / 1"}
+  ];
+  document.getElementById("kpis").innerHTML = k.map(x=>
+    `<button class="kpi${x.red?" red":""}" ${x.f?`data-f="${x.f}"`:""}><div class="l">${x.l}</div><div class="v">${x.v}</div></button>`).join("");
+  document.querySelectorAll(".kpi[data-f]").forEach(b=>b.onclick=()=>{setFilter(b.dataset.f);document.getElementById("patients").scrollIntoView({behavior:"smooth",block:"center"});});
+}
+
+function renderAlerts(){
+  const list = buildAlerts();
+  document.getElementById("alerts").innerHTML = list.map(a=>
+    `<button class="row${done.has(a.id)?" done":""}" data-a="${a.id}"><span class="dot ${done.has(a.id)?"green":a.sev}"></span><div class="grow"><p class="t">${a.t}</p><p class="s">${done.has(a.id)?"Als erledigt markiert":a.s}</p></div><span class="chev">›</span></button>`).join("");
+  document.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>openAlert(list.find(x=>x.id===b.dataset.a)));
+}
+
+const FILTERS = [["alle","Alle"],["aplasie","Aplasie"],["fieber","Fieber"],["chemo","Chemo heute"],["studie","Studie"]];
+let filter = "alle";
+function setFilter(f){ filter=f; renderFilters(); renderPatients(); }
+function renderFilters(){
+  document.getElementById("filters").innerHTML = FILTERS.map(([k,l])=>`<button class="chip${filter===k?" on":""}" data-k="${k}">${l}</button>`).join("");
+  document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>setFilter(c.dataset.k));
+}
+function renderPatients(){
+  const test = {alle:()=>true,aplasie:isAplasie,fieber:isFieber,chemo:p=>p.chemo,studie:p=>p.studie}[filter];
+  const list = PATIENTS.filter(test);
+  document.getElementById("patients").innerHTML = list.length ? list.map(p=>{
+    const sev = isFieber(p)&&isAplasie(p)?"red":(isFieber(p)||last(p.plt)<10||isAplasie(p))?"amber":"green";
+    const tags = (isAplasie(p)?'<span class="tag amber">Aplasie</span>':"")+(isFieber(p)?'<span class="tag red">Fieber</span>':"")+(p.studie?'<span class="tag blue">Studie</span>':"");
+    return `<button class="row" data-p="${p.id}"><span class="dot ${sev}"></span><div class="grow"><p class="t">${p.id} · ${p.alter} · ${p.dx}${tags}</p><p class="s">${p.phase} · Woche ${p.w[0]} von ${p.w[1]}</p><div class="bar"><i style="width:${Math.round(p.w[0]/p.w[1]*100)}%"></i></div></div><span class="chev">›</span></button>`;
+  }).join("") : `<div class="row" style="cursor:default"><p class="s">Keine Einträge für diesen Filter.</p></div>`;
+  document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>openPatient(b.dataset.p));
+}
+
+function renderToday(){
+  document.getElementById("today").innerHTML = TODAY.map(([z,t,s])=>
+    `<div class="row" style="cursor:default"><span class="time">${z}</span><div class="grow"><p class="t">${t}</p><p class="s">${s}</p></div></div>`).join("");
+}
+function renderStudies(){
+  document.getElementById("studies").innerHTML = STUDIES.map(x=>
+    `<div class="row" style="cursor:default"><span class="dot ${x.sev}"></span><div class="grow"><p class="t">${x.t}</p><p class="s">${x.s}</p></div></div>`).join("");
+}
+function renderLead(){
+  document.getElementById("lead").innerHTML =
+    `<div class="card"><p class="s">Offene Arztbriefe</p><p class="big" style="margin:0">${LEAD.briefe}</p><p class="s" style="color:var(--amber)">${LEAD.briefeAlt} älter als 7 Tage</p></div>
+     <div class="card"><p class="s">Dienste diese Woche</p><p class="big" style="margin:0">${LEAD.gaps.length} Lücke</p><div class="week">${LEAD.week.map((d,i)=>`<div class="${LEAD.gaps.includes(i)?"gap":""}">${d}</div>`).join("")}</div></div>`;
+}
+
+function renderQuality(){
+  const {labels,values} = QUALITY, W=320, H=130, pad=22, max=Math.max(...values)+1;
+  const bw = (W-pad)/values.length;
+  const bars = values.map((v,i)=>{
+    const h = (v/max)*(H-34), x = pad+i*bw+bw*0.2, y = H-18-h;
+    return `<rect x="${x}" y="${y}" width="${bw*0.6}" height="${h}" rx="3" fill="var(--blue)" opacity="${i===values.length-1?1:.55}"/>
+            <text x="${x+bw*0.3}" y="${y-4}" font-size="11" text-anchor="middle" fill="var(--text)">${v}</text>
+            <text x="${x+bw*0.3}" y="${H-4}" font-size="11" text-anchor="middle" fill="var(--muted)">${labels[i]}</text>`;
+  }).join("");
+  document.getElementById("quality").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Episoden Fieber in Neutropenie pro Monat">${bars}</svg><p class="legend">Episoden pro Monat, aktueller Monat hervorgehoben</p>`;
+}
+
+function spark(arr, color, threshold, tLabel){
+  const W=300,H=64,p=6, min=Math.min(...arr, threshold??Infinity), max=Math.max(...arr, threshold??-Infinity);
+  const span = (max-min)||1, X=i=>p+i*(W-2*p)/(arr.length-1), Y=v=>H-p-((v-min)/span)*(H-2*p);
+  const d = arr.map((v,i)=>`${i?"L":"M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const th = threshold!=null ? `<line x1="${p}" x2="${W-p}" y1="${Y(threshold)}" y2="${Y(threshold)}" stroke="var(--red)" stroke-dasharray="4 4" stroke-width="1"/><text x="${W-p}" y="${Y(threshold)-4}" font-size="10" text-anchor="end" fill="var(--red)">${tLabel}</text>` : "";
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="none" style="height:64px">${th}<path d="${d}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${X(arr.length-1)}" cy="${Y(last(arr))}" r="3.5" fill="${color}"/></svg>`;
+}
+function trend(label, arr, unit, color, th, thl, dec){
+  const v = dec ? fmt(last(arr)) : last(arr);
+  return `<div class="trend"><div class="h"><span>${label}</span><span><b>${v}</b> ${unit}</span></div>${spark(arr,color,th,thl)}<p class="s">Letzte 7 Tage</p></div>`;
+}
+
+function openPatient(id){
+  const p = PATIENTS.find(x=>x.id===id);
+  document.getElementById("dlg-title").textContent = `${p.id} · ${p.alter} · ${p.dx}`;
+  document.getElementById("dlg-sub").textContent = `${p.phase} · Woche ${p.w[0]} von ${p.w[1]}${p.studie?" · Studienpatient":""}`;
+  document.getElementById("dlg-body").innerHTML =
+    `<div class="bar" style="height:8px"><i style="width:${Math.round(p.w[0]/p.w[1]*100)}%"></i></div>`+
+    trend("Neutrophile (ANC)",p.anc,"/nl","var(--blue)",0.5,"0,5",true)+
+    trend("Thrombozyten",p.plt,"/nl","var(--amber)",10,"10",false)+
+    trend("Temperatur",p.temp,"°C","var(--red)",38.0,"38,0",true)+
+    `<p class="s" style="margin-top:10px">Chemo heute: ${p.chemo?"ja":"nein"}</p>`;
+  document.getElementById("dlg").showModal();
+}
+function openAlert(a){
+  if (a.pid){ openPatient(a.pid); }
+  else {
+    document.getElementById("dlg-title").textContent = a.t;
+    document.getElementById("dlg-sub").textContent = a.s;
+    document.getElementById("dlg-body").innerHTML = "";
+    document.getElementById("dlg").showModal();
+  }
+  const body = document.getElementById("dlg-body");
+  const isDone = done.has(a.id);
+  body.insertAdjacentHTML("beforeend", `<button class="btn${isDone?"":" primary"}" id="toggleDone">${isDone?"Wieder als offen markieren":"Als erledigt markieren"}</button>`);
+  document.getElementById("toggleDone").onclick = ()=>{
+    isDone ? done.delete(a.id) : done.add(a.id); saveDone(); renderAlerts(); document.getElementById("dlg").close();
+  };
+}
+
+document.getElementById("dlg").addEventListener("click", e=>{ if (e.target.id==="dlg") e.target.close(); });
+const now = new Date();
+document.getElementById("stand").textContent = now.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",year:"numeric"}) + " · Stand " + now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+renderKPIs(); renderAlerts(); renderFilters(); renderPatients(); renderToday(); renderStudies(); renderLead(); renderQuality();
+</script>
+</body>
+</html>
